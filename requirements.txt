@@ -1,0 +1,10 @@
+pygame==2.6.1
+colorama==0.4.6
+coverage==7.11.3
+iniconfig==2.3.0
+packaging==25.0
+pathlib==1.0.1
+pluggy==1.6.0
+pygame==2.6.1
+Pygments==2.19.2
+pytest==9.0.0
