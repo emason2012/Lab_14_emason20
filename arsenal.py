@@ -14,25 +14,33 @@ if TYPE_CHECKING:
 
 
 class Arsenal:
+    """Manage creation, updating, and drawing of the ship's bullets."""
+
     def __init__(self, game: 'AlienInvasion'):
+        """Initialize an empty arsenal tied to the given game."""
         self.game = game
         self.settings = game.settings
         self.arsenal = pygame.sprite.Group()
-    
-    def update_arsenal(self):
+
+    def update_arsenal(self) -> None:
+        """Update bullet positions and remove any off-screen bullets."""
         self.arsenal.update()
         self._remove_bullets_offscreen()
 
-    def _remove_bullets_offscreen(self):
+    def _remove_bullets_offscreen(self) -> None:
+        """Remove bullets that have moved past the right edge of the screen."""
+        screen_rect = self.game.screen.get_rect()
         for bullet in self.arsenal.copy():
-            if bullet.rect.bottom <= 0:
+            if bullet.rect.left >= screen_rect.right:
                 self.arsenal.remove(bullet)
 
-    def draw(self):
+    def draw(self) -> None:
+        """Draw all active bullets in the arsenal."""
         for bullet in self.arsenal:
             bullet.draw_bullet()
 
-    def fire_bullet(self):
+    def fire_bullet(self) -> bool:
+        """Create a new bullet if the maximum on-screen limit is not reached."""
         if len(self.arsenal) < self.settings.bullet_amount:
             new_bullet = Bullet(self.game)
             self.arsenal.add(new_bullet)

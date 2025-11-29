@@ -12,8 +12,10 @@ if TYPE_CHECKING:
     from alien_invasion import AlienInvasion
 
 class GameStats():
+    """Saves all of the different game stats like level and scores"""
 
     def __init__(self, game: 'AlienInvasion'):
+        "attempts to load high score as well as initializes stats"
         self.game = game
         self.settings = game.settings
         self.max_score = 0
@@ -21,6 +23,7 @@ class GameStats():
         self.reset_stats()
 
     def init_saved_scores(self):
+        """Load hi score from file or create a new one"""
         self.path = self.settings.scores_file
         if self.path.exists() and self.path.stat.__sizeof__() > 20:
             contents = self.path.read_text()
@@ -31,6 +34,7 @@ class GameStats():
             self.save_scores()
 
     def save_scores(self):
+        """Send the high score to the score file if applicaple """
         scores = {
             'hi_score': self.hi_score
         }
@@ -41,11 +45,13 @@ class GameStats():
             print(f'File Not Found: {e}')
 
     def reset_stats(self):
+        """Resets the stats for a new game session"""
         self.ships_left = self.settings.starting_ship_count
         self.score = 0
         self.level = 1
 
     def update(self, collisions):
+        """Updates scores based on collisions"""
         self._update_score(collisions)
 
         self._update_max_score()
@@ -53,17 +59,21 @@ class GameStats():
         self._update_hi_score()
 
     def _update_max_score(self):
+        """Updates max score in current session"""
         if self.score > self.max_score:
             self.max_score = self.score
             
     def _update_hi_score(self):
+        """Updates Max score reached all time"""
         if self.score > self.hi_score:
             self.hi_score = self.score
             self.save_scores()
 
     def _update_score(self, collisions):
+        """Updates base score based on alien colllision"""
         for alien in collisions.values():
             self.score += self.settings.alien_points
 
     def update_level(self):
+        """Increase level based on clear"""
         self.level += 1

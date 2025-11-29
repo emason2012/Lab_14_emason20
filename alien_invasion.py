@@ -18,8 +18,9 @@ from hud import HUD
 
 
 class AlienInvasion:
-    #controls base functions of the game such as display, sounds, and fps
+    """controls base functions of the game such as display, sounds, and fps"""
     def __init__(self) -> None:
+        """"Initialize the game and its resources"""
         pygame.init()
         self.settings = Settings()
         self.settings.initialize_dynamic_settings()
@@ -54,7 +55,7 @@ class AlienInvasion:
     
     
     def run_game(self) -> None:
-        #Game Loop
+        """Game Loop"""
         while self.running:
             self._check_events()
             if self.game_active:
@@ -66,10 +67,14 @@ class AlienInvasion:
 
 
     def _check_collisions(self):
-        #check collisions for ship
+        """check collisions for ship"""
         if self.ship.check_collisions(self.alien_fleet.fleet):
             self._check_game_status()
             #subtract one life if possible
+
+        if self.alien_fleet.check_left_side():
+            self._check_game_status()
+            return
 
         #check collisions for aliens and bottom of screen
         if self.alien_fleet.check_fleet_bottom():
@@ -91,6 +96,7 @@ class AlienInvasion:
             
         
     def _check_game_status(self):
+        """Checks if game shoudl still be running"""
         if self.game_stats.ships_left > 0:
             self.game_stats.ships_left -= 1
             self._reset_level()
@@ -102,11 +108,13 @@ class AlienInvasion:
         print(self.game_stats.ships_left)
 
     def _reset_level(self):
+        """resests the level back to original state"""
         self.ship.arsenal.arsenal.empty()
         self.alien_fleet.fleet.empty()
         self.alien_fleet.create_fleet()
 
     def restart_game(self):
+        """Restarts the entire game as well as stats"""
         self.settings.initialize_dynamic_settings()
         self.game_stats.reset_stats()
         self.HUD.update_scores()
@@ -116,7 +124,7 @@ class AlienInvasion:
         pygame.mouse.set_visible(False)
 
     def _update_screen(self) -> None:
-        #updates the screen for ship location
+        """updates the screen for ship location"""
         self.screen.blit(self.bg, (0,0))
         self.ship.draw()
         self.alien_fleet.draw()
@@ -130,11 +138,11 @@ class AlienInvasion:
         pygame.display.flip()
 
     def _check_events(self) -> None:
-        #does initial check for any input from a keyboard such as q to quit or arrow keys for moveement
+        """does initial check for any input from a keyboard such as q to quit or arrow keys for moveement"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                self.game_stats.save_scores
+                self.game_stats.save_scores()
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN and self.game_active == True:
@@ -145,25 +153,26 @@ class AlienInvasion:
                 self._check_button_clicked()
 
     def _check_button_clicked(self):
+        """Checks if the button to start game was clicked"""
         mouse_pos = pygame.mouse.get_pos()
         if self.play_button.check_clicked(mouse_pos):
             self.restart_game()
 
 
     def _check_keyup_events(self, event) -> None:
-        #checks for when a key is lifted after beubg pressed/ not being pressed
-        if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = False
+        """checks for when a key is lifted after beubg pressed/ not being pressed"""
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = False
+        elif event.key == pygame.K_DOWN:
+            self.ship.moving_down = False
 
 
     def _check_keydown_events(self, event) -> None:
-        #checks for when a key is pressed down
-        if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = True
+        """checks for when a key is pressed down"""
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = True
+        elif event.key == pygame.K_DOWN:
+            self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
             if self.ship.fire():
                 self.laser_sound.play()
